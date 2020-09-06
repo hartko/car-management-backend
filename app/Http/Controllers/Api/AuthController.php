@@ -4,35 +4,18 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Validator;
+
+use App\Http\Requests\Validation\AuthRequest;
 
 class AuthController extends Controller
 {
-    public function login(Request $request){
+    public function login(AuthRequest $request){
 
-        /*validate login data*/
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
-
-        /*check validation*/
-        if(!$validator->fails()){
-            if (! $token = auth()->attempt(request(['email', 'password']))) {
-                return response()->json(['msg' => 'Invalid Credentials! Please check your username or password.']);
-            }
-
-            return $this->respondWithToken($token);
-
-        }else{
-
-            return response()->json([
-                'msg' => $validator->errors(),
-                'status' => 'failed'
-        ]);
-
-
+        if (! $token = auth()->attempt(request(['email', 'password']))) {
+            return response()->json(['message' => 'Invalid Credentials! Please check your username or password.']);
         }
+
+        return $this->respondWithToken($token);
     }
 
     public function logout()
